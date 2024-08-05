@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces
 {
@@ -6,8 +7,8 @@ namespace Domain.Interfaces
     {
         IEnumerable<ToDoItem> GetTasks();
         ToDoItem GetTaskById(int id);
-        void CreateTask(ToDoItem task);
-        void UpdateTask(ToDoItem task);
+        ToDoItemResponse CreateTask(ToDoItemRequest task);
+        ToDoItemResponse UpdateTask(ToDoItemRequest task, int id);
         void DeleteTask(int id);
     }
 }

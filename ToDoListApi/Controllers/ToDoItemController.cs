@@ -1,6 +1,9 @@
 ﻿using DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Domain.Interfaces;
+using Domain.Models;
+using System.Net;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ToDoListApi.Controllers
 {
@@ -27,27 +30,29 @@ namespace ToDoListApi.Controllers
             var task = _toDoItemService.GetTaskById(id);
             if (task == null)
             {
-                return NotFound("Não existe na base id: " + id);
+                return NotFound("Não existe na base o id: " + id);
             }
             return Ok(task);
         }
 
         [HttpPost("[controller]/post")]
-        public IActionResult CreateTask([FromBody] ToDoItem task)
+        [SwaggerResponse((int)HttpStatusCode.Created, type: typeof(ToDoItemResponse))]
+        public IActionResult CreateTask([FromBody] ToDoItemRequest task)
         {
             if (task == null)
             {
                 return BadRequest();
             }
 
-            _toDoItemService.CreateTask(task);
-            return CreatedAtAction(nameof(GetTask), new { id = task.Id }, task);
+            var response = _toDoItemService.CreateTask(task);
+            return CreatedAtAction(nameof(GetTask), response);
         }
 
         [HttpPut("[controller]/put")]
-        public IActionResult UpdateTask([FromQuery] int id, [FromBody] ToDoItem task)
+        [SwaggerResponse((int)HttpStatusCode.Created, type: typeof(ToDoItemResponse))]
+        public IActionResult UpdateTask([FromQuery] int id, [FromBody] ToDoItemRequest task)
         {
-            if (task == null || task.Id != id)
+            if (task == null || id == 0)
             {
                 return BadRequest();
             }
@@ -55,10 +60,10 @@ namespace ToDoListApi.Controllers
             var existingTask = _toDoItemService.GetTaskById(id);
             if (existingTask == null)
             {
-                return NotFound("Não existe na base id: " + id);
+                return NotFound("Não existe na base o id: " + id);
             }
 
-            _toDoItemService.UpdateTask(task);
+            var response = _toDoItemService.UpdateTask(task, id);
             return NoContent();
         }
 
@@ -68,7 +73,7 @@ namespace ToDoListApi.Controllers
             var task = _toDoItemService.GetTaskById(id);
             if (task == null)
             {
-                return NotFound("Não existe na base id: " + id);
+                return NotFound("Não existe na base o id: " + id);
             }
 
             _toDoItemService.DeleteTask(id);
